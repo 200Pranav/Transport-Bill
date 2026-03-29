@@ -1,0 +1,296 @@
+{% load static %} 
+<!DOCTYPE html>
+
+<html>
+<head>
+
+<title>Transport Invoice</title>
+
+<style>
+
+body{
+font-family: Arial;
+background:#f4f4f4;
+}
+
+.bill{
+width:1000px;
+margin:auto;
+background:white;
+padding:20px;
+border:2px solid #333;
+}
+
+.header{
+display:grid;
+grid-template-columns:100px 1fr;
+align-items:center;
+gap:0px;
+border-bottom:2px solid #333;
+padding-bottom:2px;
+}
+
+.logo-area{
+display:flex;
+justify-content:center;
+align-items:center;
+}
+
+.logo{
+width:90px;
+height:auto;
+}
+
+.company-area{
+text-align:center;
+}
+
+.company-area h1{
+margin:0;
+font-size:45px;
+font-family:'Cambria Math';
+font-weight:900;
+color:red;
+}
+
+.subhead{
+font-weight:bold;
+color:#322e80;
+line-height:1.4;
+margin-top:2px;
+}
+
+.code{
+color:red;
+}
+
+hr{
+border:none;
+height:1.5px;
+background-color:#000;
+margin:5px 0;
+}
+
+.top-info{
+display:flex;
+justify-content:space-between;
+margin-top:15px;
+}
+
+.top-left{ width:65%; }
+.top-right{ width:30%; text-align:right; }
+
+table{
+width:100%;
+border-collapse:collapse;
+margin-top:15px;
+}
+
+th,td{
+border:1px solid black;
+padding:8px;
+text-align:center;
+vertical-align:top;
+}
+
+.signature{
+text-align:right;
+margin-top:40px;
+font-weight:bold;
+}
+
+.print-btn{
+margin-top:20px;
+text-align:center;
+}
+
+button{
+padding:10px 20px;
+background:#3498db;
+color:white;
+border:none;
+cursor:pointer;
+}
+
+button:hover{
+background:#2980b9;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="bill">
+
+<div class="header">
+<div class="logo-area">
+<img src="{% static 'logo.jpeg' %}" class="logo">
+</div>
+
+<div class="company-area">
+<h1>MAA VINDHYAWASINI ROADLINES</h1>
+
+<p class="subhead">
+FLEET OWNER'S APPROVED TRANSPORT CONTRACTORS <br>
+FULL & PART LOAD ALL OVER INDIA<br>
+Mob.: 7977875273 / 8793636734 &nbsp;&nbsp; Email: maavindhyawasiniroadlines@gmail.com<br>
+Add: Gala No. 07, Jai Bhagwan Compound, Purna Village, Bhiwandi, Dist- Thane-421302
+</p>
+</div>
+</div>
+
+<p class="code">
+<b>SAC CODE: 996511</b>
+<span style="float:right"><b>GSTIN: 27CMOPD5236P1ZG</b></span>
+</p>
+
+<hr>
+
+<div class="top-info">
+
+<div class="top-left">
+<b>M/S:</b> {{ bill.ms }} <br>
+{{ bill.ms_address1 }} <br>
+{{ bill.ms_address2 }}
+</div>
+
+<div class="top-right">
+<b>Bill No:</b> {{ bill.bill_no }} <br>
+<b>Date:</b> {{ bill.date }} <br>
+<b>Vehicle No:</b> {{ bill.vehicle_no }}
+</div>
+
+</div>
+
+<br>
+
+<b>Consignor GSTIN:</b> {{ bill.consignor_gstin|default_if_none:"" }}
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<b>Consignee GSTIN:</b> {{ bill.consignee_gstin|default_if_none:"" }}
+
+<table>
+
+<tr>
+<th>Inv No</th>
+<th>G.C Note No</th>
+<th>From</th>
+<th>To</th>
+<th>Pkg</th>
+<th>Particular</th>
+<th>Weight</th>
+<th>Amount</th>
+</tr>
+
+<tr>
+<td>{{ bill.invoice_no }}</td>
+<td>{{ bill.gc_note_no }}</td>
+<td>{{ bill.from_location }}</td>
+<td>{{ bill.to_location }}</td>
+<td>{{ bill.pkg }}</td>
+<td>{{ bill.particular }}</td>
+<td>{{ bill.weight }}</td>
+<td>{{ bill.amount }}</td>
+</tr>
+
+{% if bill.consignee_gstin %}
+<tr>
+<td colspan="8"><b>GST PAID BY CONSIGNEE</b></td>
+</tr>
+{% elif bill.consignor_gstin and gst_by_consignor == "yes" %}
+<tr>
+<td colspan="8"><b>GST PAID BY CONSIGNOR</b></td>
+</tr>
+{% endif %}
+
+{% for i in "123456789012345" %}
+<tr>
+<td>&nbsp;</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+{% endfor %}
+
+<!-- FINAL SECTION -->
+
+<tr>
+<td colspan="4" rowspan="4" style="text-align:left; color:red;" >
+<b>BANK DETAILS:</b><br><br>
+ICICI BANK, KALHER BRANCH (BHIWANDI)<br>
+A/C NO. 352505000449<br>
+IFSC: ICIC0003525
+</td>
+
+<td colspan="3"><b>Total</b></td>
+<td>{{ bill.amount }}</td>
+</tr>
+{% if bill.gst_choice == "yes" %}
+<tr>
+<td colspan="3">CGST</td>
+<td>{{ bill.cgst }}</td>
+</tr>
+
+<tr>
+<td colspan="3">SGST</td>
+<td>{{ bill.sgst }}</td>
+</tr>
+{% else %}
+<tr>
+<td colspan="3">CGST</td>
+<td>0.00</td>
+</tr>
+
+<tr>
+<td colspan="3">SGST</td>
+<td>0.00</td>
+</tr>
+{% endif %}
+
+<tr>
+<td colspan="3"><b>Grand Total</b></td>
+{% if bill.gst_choice == "yes" %}
+<td><b>{{ bill.grand_total }}</b></td>
+{% else %}
+<td><b>{{ bill.amount }}</b></td>
+{% endif %}
+</tr>
+
+<tr>
+<td colspan="4" style="text-align:left;">
+<b>Rupees In Words:</b> {{ words }}
+</td>
+<td colspan="4"></td>
+</tr>
+
+</table>
+<div class="signature" style="position:relative; color:red; text-align:right; margin-top:50px;">
+
+{% if bill.add_stamp == "yes" %}
+<img src="{% static 'add_stamp.png' %}" 
+     style="position:absolute; 
+            right:80px; 
+            top:-40px; 
+            width:160px; 
+            opacity:0.75;">
+{% endif %}
+
+FOR MAA VINDHYAWASINI ROADLINES<br><br>
+Authorised Signatory
+
+</div>
+
+<div class="print-btn">
+<button onclick="window.print()">Print Bill</button>
+</div>
+
+</div>
+
+</body>
+
+</html>

@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Transport Bill</title>
+
+<style>
+
+body{
+    font-family: Arial, sans-serif;
+    background:#f4f6f9;
+    margin:0;
+    padding:0;
+}
+
+.container{
+    width:700px;
+    margin:40px auto;
+    background:white;
+    padding:30px;
+    border-radius:10px;
+    box-shadow:0 8px 20px rgba(0,0,0,0.15);
+}
+
+h2{
+    text-align:center;
+    color:#2c3e50;
+}
+
+.form-group{
+    margin-bottom:15px;
+}
+
+label{
+    display:block;
+    margin-bottom:5px;
+    font-weight:bold;
+    color:#34495e;
+}
+
+input,select{
+    width:100%;
+    padding:10px;
+    border:1px solid #ccc;
+    border-radius:5px;
+    box-sizing:border-box;
+    transition:0.3s;
+}
+
+input:hover,select:hover{
+    border-color:#3498db;
+}
+
+input:focus{
+    outline:none;
+    border-color:#3498db;
+    box-shadow:0 0 5px rgba(52,152,219,0.5);
+}
+
+button{
+    width:100%;
+    padding:12px;
+    background:#3498db;
+    color:white;
+    border:none;
+    border-radius:5px;
+    font-size:16px;
+    cursor:pointer;
+}
+
+button:hover{
+    background:#2980b9;
+}
+
+.total-box{
+    background:#ecf0f1;
+    padding:15px;
+    border-radius:5px;
+}
+
+.words-box{
+    background:#fdf2e9;
+    padding:10px;
+    border-radius:5px;
+}
+
+</style>
+
+<script>
+
+function toggleGST(){
+
+    let choice = document.getElementById("gst_choice").value
+    let gstSection = document.getElementById("gst_section")
+
+    if(choice == "yes"){
+        gstSection.style.display = "block"
+    }else{
+        gstSection.style.display = "none"
+    }
+
+    calculateTotal()
+}
+
+function numberToWords(num){
+
+const ones=["","one","two","three","four","five","six","seven","eight","nine",
+"ten","eleven","twelve","thirteen","fourteen","fifteen","sixteen",
+"seventeen","eighteen","nineteen"]
+
+const tens=["","","twenty","thirty","forty","fifty","sixty","seventy","eighty","ninety"]
+
+if(num<20) return ones[num]
+
+if(num<100)
+return tens[Math.floor(num/10)]+" "+ones[num%10]
+
+if(num<1000)
+return ones[Math.floor(num/100)]+" hundred "+numberToWords(num%100)
+
+if(num<100000)
+return numberToWords(Math.floor(num/1000))+" thousand "+numberToWords(num%1000)
+
+return num
+}
+
+function calculateTotal(){
+
+let amount = parseFloat(document.getElementById("amount").value) || 0
+let choice = document.getElementById("gst_choice").value
+
+let cgst = 0
+let sgst = 0
+let grand = amount
+
+if(choice == "yes"){
+
+    cgst = amount * 0.09
+    sgst = amount * 0.09
+    grand = amount + cgst + sgst
+
+    document.getElementById("cgst").value = cgst.toFixed(2)
+    document.getElementById("sgst").value = sgst.toFixed(2)
+
+}else{
+    // ✅ FIX: Reset GST when "No"
+    document.getElementById("cgst").value = 0
+    document.getElementById("sgst").value = 0
+}
+
+document.getElementById("total").value = amount.toFixed(2)
+document.getElementById("grand").value = grand.toFixed(2)
+
+let words = numberToWords(Math.floor(grand))
+document.getElementById("words").value = words + " rupees only"
+
+}
+
+</script>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>Transport Bill Form</h2>
+
+<form method="POST">
+
+{% csrf_token %}
+
+{% if form.errors %}
+<div style="color:red;">
+{{ form.errors }}
+</div>
+{% endif %}
+
+<div class="form-group">
+<label>M/S</label>
+<input type="text" name="ms">
+</div>
+
+<div class="form-group">
+<input type="text" name="ms_address1" placeholder="Address Line 1">
+</div>
+
+<div class="form-group">
+<input type="text" name="ms_address2" placeholder="Address Line 2">
+</div>
+
+<div class="form-group">
+<label>Bill No</label>
+<input type="text" name="bill_no">
+</div>
+
+<div class="form-group">
+<label>Date</label>
+<input type="date" name="date">
+</div>
+
+<div class="form-group">
+<label>Vehicle No</label>
+<input type="text" name="vehicle_no">
+</div>
+
+<div class="form-group">
+<label>Consignee GSTIN</label>
+<input type="text" name="consignee_gstin">
+</div>
+
+<label>Consignor GSTIN</label>
+<input type="text" name="consignor_gstin">
+
+<div class="form-group">
+<label>GST Paid by Consignor?</label>
+<select name="gst_by_consignor">
+<option value="no">No</option>
+<option value="yes">Yes</option>
+</select>
+</div>
+
+<div class="form-group">
+<label>Invoice No</label>
+<input type="text" name="invoice_no">
+</div>
+
+<div class="form-group">
+<label>G.C Note No</label>
+<input type="text" name="gc_note_no">
+</div>
+
+<div class="form-group">
+<label>From</label>
+<input type="text" name="from_location">
+</div>
+
+<div class="form-group">
+<label>To</label>
+<input type="text" name="to_location">
+</div>
+
+<div class="form-group">
+<label>Pkg</label>
+<input type="number" name="pkg">
+</div>
+
+<div class="form-group">
+<label>Particular</label>
+<input type="text" name="particular">
+</div>
+
+<div class="form-group">
+<label>Weight</label>
+<input type="text" name="weight">
+</div>
+
+<div class="form-group">
+<label>Amount</label>
+<input type="number" id="amount" name="amount" onkeyup="calculateTotal()">
+</div>
+
+<div class="form-group total-box">
+<label>Total</label>
+<input type="text" id="total" name="total" readonly>
+</div>
+
+<div class="form-group">
+<label>Apply GST?</label>
+<select id="gst_choice" name="gst_choice" onchange="toggleGST()">
+<option value="no">No</option>
+<option value="yes">Yes</option>
+</select>
+</div>
+
+<div id="gst_section" style="display:none">
+
+<div class="form-group">
+<label>CGST (9%)</label>
+<input type="text" id="cgst" name="cgst" readonly>
+</div>
+
+<div class="form-group">
+<label>SGST (9%)</label>
+<input type="text" id="sgst" name="sgst" readonly>
+</div>
+
+</div>
+
+<div class="form-group">
+<label>Add Stamp?</label>
+<select name="add_stamp">
+<option value="no">No</option>
+<option value="yes">Yes</option>
+</select>
+</div>
+
+<div class="form-group total-box">
+<label>Grand Total</label>
+<input type="text" id="grand" name="grand_total" readonly>
+</div>
+
+<div class="form-group words-box">
+<label>Rupees in Words</label>
+<input type="text" id="words" name="words" readonly>
+</div>
+
+<button type="submit">Generate Bill</button>
+
+</form>
+
+</div>
+
+</body>
+
+</html>
