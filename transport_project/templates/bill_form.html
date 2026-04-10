@@ -5,82 +5,153 @@
 
 <style>
 
+*{
+    box-sizing:border-box;
+}
+
 body{
     font-family: Arial, sans-serif;
-    background:#f4f6f9;
+    background:#dce7f5;
     margin:0;
     padding:0;
+    color:#2f4057;
 }
 
 .container{
-    width:700px;
+    width:min(1000px, 95%);
     margin:40px auto;
-    background:white;
-    padding:30px;
-    border-radius:10px;
-    box-shadow:0 8px 20px rgba(0,0,0,0.15);
+    padding:24px;
+    background: linear-gradient(135deg, #eef4fb 0%, #e7eff9 100%);
+    border-radius:26px;
+}
+
+.form-card{
+    background: linear-gradient(180deg, #fff8ec 0%, #e8f4ff 100%);
+    border:1px solid #c8d7e9;
+    border-radius:22px;
+    padding:34px;
+    box-shadow:0 30px 70px rgba(17, 51, 89, 0.18);
 }
 
 h2{
     text-align:center;
-    color:#2c3e50;
+    color:#ba1f28;
+    margin-bottom:20px;
+}
+
+.section-title{
+    font-size:20px;
+    margin-bottom:20px;
+    color:#1f3268;
+    padding-bottom:10px;
+    border-bottom:1px solid #e3e9f2;
+}
+
+.error-box{
+    color:#b02a37;
+    margin-bottom:16px;
+    padding:14px;
+    border:1px solid #f1b0b0;
+    background:#fff1f1;
+    border-radius:12px;
+}
+
+.form-grid{
+    display:grid;
+    grid-template-columns:repeat(2, minmax(0, 1fr));
+    gap:16px;
+}
+
+.form-grid-wide{
+    grid-column:1 / -1;
 }
 
 .form-group{
-    margin-bottom:15px;
+    margin-bottom:18px;
+    display:flex;
+    flex-direction:column;
 }
 
 label{
     display:block;
-    margin-bottom:5px;
-    font-weight:bold;
+    margin-bottom:8px;
+    font-weight:700;
     color:#34495e;
 }
 
-input,select{
+input, select{
     width:100%;
-    padding:10px;
-    border:1px solid #ccc;
-    border-radius:5px;
-    box-sizing:border-box;
-    transition:0.3s;
+    padding:12px 14px;
+    border:1px solid #c5cedb;
+    border-radius:10px;
+    background:#fbfdff;
+    transition:all 0.25s ease;
+    box-shadow:inset 0 1px 4px rgba(34,85,153,0.08);
 }
 
-input:hover,select:hover{
-    border-color:#3498db;
+input:hover, select:hover{
+    border-color:#5c9cf4;
 }
 
-input:focus{
+input:focus, select:focus{
     outline:none;
-    border-color:#3498db;
-    box-shadow:0 0 5px rgba(52,152,219,0.5);
+    border-color:#4b8de9;
+    box-shadow:0 0 0 4px rgba(74, 140, 234, 0.12);
 }
 
 button{
     width:100%;
-    padding:12px;
-    background:#3498db;
+    max-width:360px;
+    padding:14px;
+    background:#1b6adf;
     color:white;
     border:none;
-    border-radius:5px;
+    border-radius:14px;
     font-size:16px;
+    font-weight:700;
     cursor:pointer;
+    box-shadow:0 12px 26px rgba(27,106,223,0.22);
+    transition:transform 0.25s ease, background 0.25s ease;
+    margin:0 auto;
+    display:block;
 }
 
 button:hover{
-    background:#2980b9;
+    background:#1556b8;
+    transform:translateY(-1px);
+}
+
+.button-row{
+    display:flex;
+    justify-content:center;
+    margin-top:24px;
 }
 
 .total-box{
-    background:#ecf0f1;
-    padding:15px;
-    border-radius:5px;
+    background:#f4f7fb;
+    padding:16px;
+    border:1px solid #dbe4ef;
+    border-radius:12px;
 }
 
 .words-box{
-    background:#fdf2e9;
-    padding:10px;
-    border-radius:5px;
+    background:#fff7e5;
+    padding:16px;
+    border:1px solid #f0dcc2;
+    border-radius:12px;
+}
+
+@media (max-width: 768px) {
+    .form-grid{
+        grid-template-columns:1fr;
+    }
+    .container{
+        margin:24px auto;
+        padding:16px;
+    }
+    button{
+        max-width:100%;
+    }
 }
 
 </style>
@@ -155,6 +226,12 @@ document.getElementById("words").value = words + " rupees only"
 
 }
 
+window.addEventListener('DOMContentLoaded', function() {
+    if (document.getElementById('amount')) {
+        calculateTotal();
+    }
+});
+
 </script>
 
 </head>
@@ -163,140 +240,157 @@ document.getElementById("words").value = words + " rupees only"
 
 <div class="container">
 
-<h2>Transport Bill Form</h2>
+<div class="form-card">
+
+<h2>MAA VINDHYAWASINI ROADLINES</h2>
+<div class="section-title">Bill Details</div>
 
 <form method="POST">
 
 {% csrf_token %}
 
 {% if form.errors %}
-<div style="color:red;">
+<div class="error-box">
 {{ form.errors }}
 </div>
 {% endif %}
 
+<div class="form-grid">
+
 <div class="form-group">
 <label>M/S</label>
-<input type="text" name="ms">
-</div>
-
-<div class="form-group">
-<input type="text" name="ms_address1" placeholder="Address Line 1">
-</div>
-
-<div class="form-group">
-<input type="text" name="ms_address2" placeholder="Address Line 2">
+<input type="text" name="ms" value="{{ bill.ms|default_if_none:'' }}">
 </div>
 
 <div class="form-group">
 <label>Bill No</label>
-<input type="text" name="bill_no">
+<input type="text" name="bill_no" value="{{ bill.bill_no|default_if_none:'' }}">
+</div>
+
+<div class="form-group">
+<label>Address Line 1</label>
+<input type="text" name="ms_address1" placeholder="Address Line 1" value="{{ bill.ms_address1|default_if_none:'' }}">
 </div>
 
 <div class="form-group">
 <label>Date</label>
-<input type="date" name="date">
+<input type="date" name="date" value="{{ bill.date|default_if_none:'' }}">
+</div>
+
+<div class="form-group">
+<label>Address Line 2</label>
+<input type="text" name="ms_address2" placeholder="Address Line 2" value="{{ bill.ms_address2|default_if_none:'' }}">
 </div>
 
 <div class="form-group">
 <label>Vehicle No</label>
-<input type="text" name="vehicle_no">
+<input type="text" name="vehicle_no" value="{{ bill.vehicle_no|default_if_none:'' }}">
 </div>
 
 <div class="form-group">
 <label>Consignee GSTIN</label>
-<input type="text" name="consignee_gstin">
+<input type="text" name="consignee_gstin" value="{{ bill.consignee_gstin|default_if_none:'' }}">
 </div>
 
-<label>Consignor GSTIN</label>
-<input type="text" name="consignor_gstin">
-
 <div class="form-group">
+<label>Consignor GSTIN</label>
+<input type="text" name="consignor_gstin" value="{{ bill.consignor_gstin|default_if_none:'' }}">
+</div>
+
+<div class="form-group form-grid-wide">
 <label>GST Paid by Consignor?</label>
 <select name="gst_by_consignor">
-<option value="no">No</option>
-<option value="yes">Yes</option>
+<option value="no" {% if bill.gst_by_consignor == "no" %}selected{% endif %}>No</option>
+<option value="yes" {% if bill.gst_by_consignor == "yes" %}selected{% endif %}>Yes</option>
 </select>
 </div>
 
 <div class="form-group">
 <label>Invoice No</label>
-<input type="text" name="invoice_no">
+<input type="text" name="invoice_no" value="{{ bill.invoice_no|default_if_none:'' }}">
 </div>
 
 <div class="form-group">
 <label>G.C Note No</label>
-<input type="text" name="gc_note_no">
+<input type="text" name="gc_note_no" value="{{ bill.gc_note_no|default_if_none:'' }}">
 </div>
 
 <div class="form-group">
 <label>From</label>
-<input type="text" name="from_location">
+<input type="text" name="from_location" value="{{ bill.from_location|default_if_none:'' }}">
 </div>
 
 <div class="form-group">
 <label>To</label>
-<input type="text" name="to_location">
+<input type="text" name="to_location" value="{{ bill.to_location|default_if_none:'' }}">
 </div>
 
 <div class="form-group">
 <label>Pkg</label>
-<input type="number" name="pkg">
+<input type="number" name="pkg" value="{{ bill.pkg|default_if_none:'' }}">
 </div>
 
 <div class="form-group">
 <label>Particular</label>
-<input type="text" name="particular">
+<input type="text" name="particular" value="{{ bill.particular|default_if_none:'' }}">
 </div>
 
 <div class="form-group">
 <label>Weight</label>
-<input type="text" name="weight">
+<input type="text" name="weight" value="{{ bill.weight|default_if_none:'' }}">
 </div>
 
 <div class="form-group">
 <label>Amount</label>
-<input type="number" id="amount" name="amount" onkeyup="calculateTotal()">
+<input type="number" id="amount" name="amount" value="{{ bill.amount|default_if_none:'' }}" onkeyup="calculateTotal()">
 </div>
+
+</div>
+
+<div class="form-grid">
 
 <div class="form-group total-box">
 <label>Total</label>
-<input type="text" id="total" name="total" readonly>
+<input type="text" id="total" name="total" value="{{ bill.total|default_if_none:'' }}" readonly>
 </div>
 
 <div class="form-group">
 <label>Apply GST?</label>
 <select id="gst_choice" name="gst_choice" onchange="toggleGST()">
-<option value="no">No</option>
-<option value="yes">Yes</option>
+<option value="no" {% if bill.gst_choice != "yes" %}selected{% endif %}>No</option>
+<option value="yes" {% if bill.gst_choice == "yes" %}selected{% endif %}>Yes</option>
 </select>
 </div>
 
-<div id="gst_section" style="display:none">
+</div>
 
+<div id="gst_section" style="display:none">
+<div class="form-grid">
 <div class="form-group">
 <label>CGST (9%)</label>
-<input type="text" id="cgst" name="cgst" readonly>
+<input type="text" id="cgst" name="cgst" value="{{ bill.cgst|default_if_none:'0' }}" readonly>
 </div>
 
 <div class="form-group">
 <label>SGST (9%)</label>
-<input type="text" id="sgst" name="sgst" readonly>
+<input type="text" id="sgst" name="sgst" value="{{ bill.sgst|default_if_none:'0' }}" readonly>
+</div>
+</div>
 </div>
 
-</div>
-
+<div class="form-grid">
 <div class="form-group">
 <label>Add Stamp?</label>
 <select name="add_stamp">
-<option value="no">No</option>
-<option value="yes">Yes</option>
+<option value="no" {% if bill.add_stamp == "no" %}selected{% endif %}>No</option>
+<option value="yes" {% if bill.add_stamp == "yes" %}selected{% endif %}>Yes</option>
 </select>
 </div>
 
 <div class="form-group total-box">
 <label>Grand Total</label>
-<input type="text" id="grand" name="grand_total" readonly>
+<input type="text" id="grand" name="grand_total" value="{{ bill.grand_total|default_if_none:'' }}" readonly>
+</div>
 </div>
 
 <div class="form-group words-box">
@@ -304,9 +398,13 @@ document.getElementById("words").value = words + " rupees only"
 <input type="text" id="words" name="words" readonly>
 </div>
 
-<button type="submit">Generate Bill</button>
+<div class="button-row">
+<button type="submit">{% if bill %}Save Bill{% else %}Generate Bill{% endif %}</button>
+</div>
 
 </form>
+
+</div>
 
 </div>
 

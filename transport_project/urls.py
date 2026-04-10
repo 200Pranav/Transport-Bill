@@ -21,4 +21,5 @@ from billing import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.create_bill, name='bill'),
+    path('bill/<int:bill_id>/edit/', views.create_bill, name='edit_bill'),
 ]

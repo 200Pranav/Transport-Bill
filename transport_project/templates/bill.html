@@ -23,22 +23,25 @@ border:2px solid #333;
 
 .header{
 display:grid;
-grid-template-columns:100px 1fr;
+grid-template-columns:80px 1fr;
 align-items:center;
-gap:0px;
+gap:12px;
 border-bottom:2px solid #333;
 padding-bottom:2px;
 }
 
 .logo-area{
 display:flex;
-justify-content:center;
+justify-content:flex-start;
 align-items:center;
+width:80px;
+overflow:visible;
 }
 
 .logo{
-width:90px;
+width:100px;
 height:auto;
+margin-left:8px;
 }
 
 .company-area{
@@ -66,9 +69,16 @@ color:red;
 
 hr{
 border:none;
-height:1.5px;
-background-color:#000;
+border-top:3px solid #000;
+height:0;
+background:none;
 margin:5px 0;
+}
+
+.full-width{
+width:100%;
+display:block;
+margin:10px 0;
 }
 
 .top-info{
@@ -112,8 +122,28 @@ border:none;
 cursor:pointer;
 }
 
+.secondary-btn{
+display:inline-block;
+margin-left:12px;
+padding:10px 20px;
+background:#555;
+color:white;
+text-decoration:none;
+border-radius:4px;
+}
+
+.secondary-btn:hover{
+background:#333;
+}
+
 button:hover{
 background:#2980b9;
+}
+
+@media print {
+    .print-btn {
+        display: none;
+    }
 }
 
 </style>
@@ -146,7 +176,7 @@ Add: Gala No. 07, Jai Bhagwan Compound, Purna Village, Bhiwandi, Dist- Thane-421
 <span style="float:right"><b>GSTIN: 27CMOPD5236P1ZG</b></span>
 </p>
 
-<hr>
+<hr class="full-width">
 
 <div class="top-info">
 
@@ -287,6 +317,7 @@ Authorised Signatory
 
 <div class="print-btn">
 <button onclick="window.print()">Print Bill</button>
+<a href="{% url 'edit_bill' bill.id %}" class="secondary-btn">Edit Bill</a>
 </div>
 
 </div>
